@@ -19,7 +19,6 @@ public class FileUploadController {
 
     private static final String UPLOAD_DIR = "/Users/flanliulf/Downloads/fileuploadtest/";
 
-
     @GetMapping("/index")
     public String index() {
         return "upload";
@@ -47,6 +46,33 @@ public class FileUploadController {
             e.printStackTrace();
         }
 
+        return "redirect:/file/result";
+    }
+
+    @GetMapping("/multi")
+    public String multi() {
+        return "upload-multi";
+    }
+
+    @PostMapping("/uploadmulti")
+    public String multiFileUpload(@RequestParam("file") MultipartFile[] files, RedirectAttributes redirectAttributes) {
+
+        if (files.length == 0) {
+            redirectAttributes.addFlashAttribute("message", "请选择需要上传的文件");
+            return "redirect:/file/result";
+        }
+
+        for (MultipartFile file : files) {
+            try {
+                byte[] bytes = file.getBytes();
+                Path path = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
+                Files.write(path, bytes);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        redirectAttributes.addFlashAttribute("message", "上传所有文件成功");
         return "redirect:/file/result";
     }
 }
